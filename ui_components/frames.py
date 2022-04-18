@@ -173,6 +173,15 @@ class MainWindow(tkinter.Frame):
             fill="#c8c8c8",
         )
 
+        x1, y1, x2, y2 = self.frame_visualization.coords(self.vis_gantry)
+        self.vis_effector = self.frame_visualization.create_rectangle(
+            0,
+            y1 - 5,
+            25,
+            y1 + 20,
+            fill="#000000",
+        )
+
     def create_drawing_frame(self):
         self.drawing = tkinter.Canvas(
             master=self.main_canvas,

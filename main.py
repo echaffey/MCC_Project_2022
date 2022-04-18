@@ -150,9 +150,17 @@ class App(tkinter.Tk):
 
         # Update visualization
         gantry = self.main_window.vis_gantry
+        effector = self.main_window.vis_effector
+
         x1, y1, x2, y2 = self.main_window.frame_visualization.coords(gantry)
+        u1, v1, u2, v2 = self.main_window.frame_visualization.coords(effector)
+
         self.main_window.frame_visualization.move(
             gantry, x1, Speed.speed_2 / 5 * y1 / 15
+        )
+
+        self.main_window.frame_visualization.move(
+            effector, u1, Speed.speed_2 / 5 * y1 / 15
         )
 
     def run(self):
