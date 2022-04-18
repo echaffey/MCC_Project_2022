@@ -40,7 +40,7 @@ class App(tkinter.Tk):
         self.encoder = MotorEncoder(Settings.ENCODER_BOARD_NUM)
         self.laser_1 = LaserSensor(Settings.ADC_BOARD_NUM, Settings.LASER_1_CHANNEL)
         self.laser_2 = LaserSensor(Settings.ADC_BOARD_NUM, Settings.LASER_2_CHANNEL)
-        self.timer = Timer(Settings.HZ)
+        # self.timer = Timer(Settings.HZ)
 
         self.main_frame = MainFrame(self)
 
@@ -83,6 +83,25 @@ class App(tkinter.Tk):
         self.bind("s", lambda e: move.draw_square(1.5))
         self.bind("d", lambda e: move.draw_diamond(2.15))
 
+        funcs = [
+            lambda: move.se(v),
+            lambda: move.neg_X(v),
+            lambda: move.sw(v),
+            lambda: move.pos_Y(v),
+            lambda: move.stop_motors(),
+            lambda: move.neg_Y(v),
+            lambda: move.ne(v),
+            lambda: move.pos_X(v),
+            lambda: move.nw(v),
+        ]
+
+        for i in range(3):
+            for j in range(3):
+                self.main_frame.buttons[i * 3 + j].config(command=funcs[i * 3 + j])
+
+        self.main_frame.btn_square.config(command=lambda: move.draw_square(v))
+        self.main_frame.btn_diamond.config(command=lambda: move.draw_diamond(v))
+
     def draw_main_frame(self, event=0):
         """Initializes the GUI window settings and displays it."""
 
@@ -116,16 +135,28 @@ class App(tkinter.Tk):
     def update_GUI(self):
         """Updates the GUI label components with the values read from the sensors."""
 
-        self.main_frame.lbl_encoder_left_val.config(text=self.get_encoder_vals()[0])
-        self.main_frame.lbl_encoder_right_val.config(text=self.get_encoder_vals()[1])
+        # self.main_frame.lbl_encoder_left_val.config(text=self.get_encoder_vals()[0])
+        # self.main_frame.lbl_encoder_right_val.config(text=self.get_encoder_vals()[1])
 
-        self.main_frame.lbl_voltage_left.config(text="Laser 1: ")
-        self.main_frame.lbl_voltage_left_val.config(
-            text=round(self.laser_1.read_laser_value()[1], 1)
+        # self.main_frame.lbl_voltage_left.config(text="Laser 1: ")
+        # self.main_frame.lbl_voltage_left_val.config(
+        #     text=round(self.laser_1.read_laser_value()[1], 1)
+        # )
+        # self.main_frame.lbl_voltage_right.config(text="Laser 2: ")
+        # self.main_frame.lbl_voltage_right_val.config(
+        #     text=round(self.laser_2.read_laser_value()[1], 1)
+        # )
+
+        self.main_frame.lbl_encoder_vals.config(
+            text="\n".join([str(val) for val in self.get_encoder_vals()])
         )
-        self.main_frame.lbl_voltage_right.config(text="Laser 2: ")
-        self.main_frame.lbl_voltage_right_val.config(
-            text=round(self.laser_2.read_laser_value()[1], 1)
+
+        laser_vals = [
+            self.laser_1.read_laser_value()[1],
+            self.laser_2.read_laser_value()[1],
+        ]
+        self.main_frame.lbl_laser_vals.config(
+            text="\n".join([str(round(val, 2)) for val in laser_vals])
         )
 
     def run(self):
@@ -136,13 +167,12 @@ class App(tkinter.Tk):
         while self.running:
 
             # self.main_frame.update_plot(a)
-            # move.adjust_speed(self.laser_1.read_laser_value()[1])
+
             if time() - start_time >= Settings.TIME_DELTA:
                 self.read_from_devices()
                 self.update_GUI()
                 self.update()
                 start_time = time()
-                # self.timer.wait()
 
         move.stop_motors()
 

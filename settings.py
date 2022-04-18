@@ -19,8 +19,9 @@ class Settings:
     MOTOR_VOLTAGE_MAX: int = 10  # Maximum allowable bipolar voltage allowed
     MOTOR_VOLTAGE_OUT: float = 3.0  # Default motor voltage output value
 
-    ENCODER_RESOLUTION: int = 0
+    ENCODER_RESOLUTION: int = 2**16 - 1  # 16-bit values
 
+    # These are the channels on the physical board
     MOTOR_1_CHANNEL: int = 0
     MOTOR_2_CHANNEL: int = 1
 
@@ -48,7 +49,7 @@ class Settings:
     """General Settings"""
     APP_NAME: str = "H-Frame Positioner GUI"
     VERSION: str = "0.0.1"
-    SPONSOR: str = "Musa Jouaneh"
+    PROFESSOR: str = "Musa Jouaneh"
     AUTHOR: str = "Evan Chaffey"
     ORGANIZATION: str = "University of Rhode Island"
     YEAR: str = "2022"
@@ -59,5 +60,5 @@ class Settings:
     USER_SETTINGS_PATH: str = ""
 
     ABOUT_TEXT: str = (
-        f"{APP_NAME} Version {VERSION} © {YEAR} {SPONSOR}, {AUTHOR}, {ORGANIZATION}"
+        f"{APP_NAME} Version {VERSION} © {YEAR} {PROFESSOR}, {AUTHOR}, {ORGANIZATION}"
     )

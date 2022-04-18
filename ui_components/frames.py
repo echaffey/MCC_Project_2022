@@ -20,7 +20,7 @@ class MainFrame(tkinter.Frame):
 
         # self.create_components()
         self.create_buttons()
-        self.set_button_functions()
+        # self.set_button_functions()
 
     def create_buttons(self):
 
@@ -34,50 +34,99 @@ class MainFrame(tkinter.Frame):
         )
         self.main_canvas.place(anchor=tkinter.CENTER, relx=0.5, rely=0.5)
 
-        # funcs = [
-        #     move.se,
-        #     move.neg_X,
-        #     move.sw,
-        #     move.neg_Y,
-        #     move.stop_motors,
-        #     move.pos_Y,
-        #     move.ne,
-        #     move.pos_X,
-        #     move.nw,
-        # ]
+        self.drawing = tkinter.Canvas(
+            master=self.main_canvas,
+            bg="white",
+            highlightthickness=0,
+            height=Settings.HEIGHT / 2,
+            width=Settings.WIDTH / 2,
+        )
+        self.drawing.place(x=0, y=Settings.WIDTH / 2 - 100)
 
-        icons = ['⭦', '⭡', '⭧', '⭠', 'S', '⭢', '⭩', '⭣', '⭨']
+        icons = ["⭦", "⭡", "⭧", "⭠", "Stop", "⭢", "⭩", "⭣", "⭨"]
 
-        buttons = []
+        self.buttons = []
 
+        # Create 3x3 grid for the directional buttons
         for i in range(3):
             for j in range(3):
-                buttons.append(
+
+                # Adjust font size only for the arrows
+                if (3 * i + j) == 4:
+                    font = 11
+                else:
+                    font = 18
+
+                self.buttons.append(
                     self.tkButton(
                         self.main_canvas,
                         text=icons[3 * i + j],
                         command=lambda: print(icons[3 * i + j]),
+                        font=tkinter.font.Font(size=font),
                     )
                 )
-                buttons[3 * i + j].place(
+                self.buttons[3 * i + j].place(
                     x=j * 45 + 15, y=i * 45 + 15, width=45, height=45
                 )
                 print(3 * i + j)
 
+        # Create function buttons
         self.btn_home = self.tkButton(
-            self.main_canvas, text='Home', command=lambda: print('Home')
+            self.main_canvas,
+            text="Home",
+            command=lambda: print("Home"),
+            font=tkinter.font.Font(size=11),
         )
         self.btn_home.place(x=175, y=15 + 7, width=75, height=30)
 
         self.btn_square = self.tkButton(
-            self.main_canvas, text='Square', command=lambda: print('Draw Square')
+            self.main_canvas,
+            text="Square",
+            command=lambda: print("Draw Square"),
+            font=tkinter.font.Font(size=11),
         )
         self.btn_square.place(x=175, y=60 + 7, width=75, height=30)
 
         self.btn_diamond = self.tkButton(
-            self.main_canvas, text='Diamond', command=lambda: print('Draw Diamond')
+            self.main_canvas,
+            text="Diamond",
+            command=lambda: print("Draw Diamond"),
+            font=tkinter.font.Font(size=11),
         )
         self.btn_diamond.place(x=175, y=105 + 7, width=75, height=30)
+
+        self.btn_draw = self.tkButton(
+            self.main_canvas,
+            text="Draw",
+            command=lambda: print("Draw Diamond"),
+            font=tkinter.font.Font(size=11),
+        )
+        self.btn_draw.place(x=325, y=200, width=55, height=30)
+
+        self.btn_clear = self.tkButton(
+            self.main_canvas,
+            text="Clear",
+            command=lambda: self.drawing.delete("all"),
+            font=tkinter.font.Font(size=11),
+        )
+        self.btn_clear.place(x=325, y=245, width=55, height=30)
+
+        # Create labels
+        self.lbl_encoders = self.tkLabel(
+            self.main_canvas, text="Encoder Values:", font=tkinter.font.Font(size=11)
+        )
+        self.lbl_encoders.place(x=275, y=15, width=105, height=25)
+
+        self.lbl_encoder_vals = self.tkLabel(self.main_canvas, text="PLACEHOLDER")
+        self.lbl_encoder_vals.place(x=275, y=45, width=95, height=55)
+
+        self.lbl_lasers = self.tkLabel(
+            self.main_canvas, text="Laser Values: ", font=tkinter.font.Font(size=11)
+        )
+        self.lbl_lasers.place(x=425, y=15, width=95, height=25)
+
+        self.lbl_laser_vals = self.tkLabel(self.main_canvas, text="PLACEHOLDER")
+        self.lbl_laser_vals.place(x=430, y=45, width=95, height=25)
 
     def create_components(self):
         """
@@ -241,4 +290,4 @@ class MainFrame(tkinter.Frame):
 
     def tkButton(self, *args, **kwargs):
         """Simplifies creating buttons with the same standard attributes"""
-        return tkinter.Button(bg=Settings.BTN_COLOR, *args, **kwargs)
+        return tkinter.Button(bg=Settings.BTN_COLOR, fg="#FFFFFF", *args, **kwargs)
