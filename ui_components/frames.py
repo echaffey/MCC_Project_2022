@@ -18,8 +18,66 @@ class MainFrame(tkinter.Frame):
 
         self.parent = parent
 
-        self.create_components()
+        # self.create_components()
+        self.create_buttons()
         self.set_button_functions()
+
+    def create_buttons(self):
+
+        # Main canvas that contains all components
+        self.main_canvas = tkinter.Canvas(
+            master=self,
+            bg=Settings.BG_COLOR,
+            highlightthickness=0,
+            height=Settings.HEIGHT,
+            width=Settings.WIDTH,
+        )
+        self.main_canvas.place(anchor=tkinter.CENTER, relx=0.5, rely=0.5)
+
+        # funcs = [
+        #     move.se,
+        #     move.neg_X,
+        #     move.sw,
+        #     move.neg_Y,
+        #     move.stop_motors,
+        #     move.pos_Y,
+        #     move.ne,
+        #     move.pos_X,
+        #     move.nw,
+        # ]
+
+        icons = ['⭦', '⭡', '⭧', '⭠', 'S', '⭢', '⭩', '⭣', '⭨']
+
+        buttons = []
+
+        for i in range(3):
+            for j in range(3):
+                buttons.append(
+                    self.tkButton(
+                        self.main_canvas,
+                        text=icons[3 * i + j],
+                        command=lambda: print(icons[3 * i + j]),
+                    )
+                )
+                buttons[3 * i + j].place(
+                    x=j * 45 + 15, y=i * 45 + 15, width=45, height=45
+                )
+                print(3 * i + j)
+
+        self.btn_home = self.tkButton(
+            self.main_canvas, text='Home', command=lambda: print('Home')
+        )
+        self.btn_home.place(x=175, y=15 + 7, width=75, height=30)
+
+        self.btn_square = self.tkButton(
+            self.main_canvas, text='Square', command=lambda: print('Draw Square')
+        )
+        self.btn_square.place(x=175, y=60 + 7, width=75, height=30)
+
+        self.btn_diamond = self.tkButton(
+            self.main_canvas, text='Diamond', command=lambda: print('Draw Diamond')
+        )
+        self.btn_diamond.place(x=175, y=105 + 7, width=75, height=30)
 
     def create_components(self):
         """
