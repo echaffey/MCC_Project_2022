@@ -1,16 +1,15 @@
 import tkinter
+
+# Import from the files contained in this project
 from settings import Settings
-
+from device_io.v_out import volt_out
 from ui_components.plotting import Plotter
-
-from device_io.v_out import set_output_voltage, volt_out
-
 from motion_control import movement as move
 
 
-class MainFrame(tkinter.Frame):
+class MainWindow(tkinter.Frame):
     """
-    Creates and places the components on the GUI.
+    Creates and places the components on the GUI window.
     """
 
     def __init__(self, parent, *args, **kwargs):
@@ -18,11 +17,11 @@ class MainFrame(tkinter.Frame):
 
         self.parent = parent
 
-        # self.create_components()
-        self.create_buttons()
-        # self.set_button_functions()
+        self.create_components()
+        self.create_drawing_frame()
+        self.create_visualization_frame()
 
-    def create_buttons(self):
+    def create_components(self):
 
         # Main canvas that contains all components
         self.main_canvas = tkinter.Canvas(
@@ -33,15 +32,6 @@ class MainFrame(tkinter.Frame):
             width=Settings.WIDTH,
         )
         self.main_canvas.place(anchor=tkinter.CENTER, relx=0.5, rely=0.5)
-
-        self.drawing = tkinter.Canvas(
-            master=self.main_canvas,
-            bg="white",
-            highlightthickness=0,
-            height=Settings.HEIGHT / 2,
-            width=Settings.WIDTH / 2,
-        )
-        self.drawing.place(x=0, y=Settings.WIDTH / 2 - 100)
 
         icons = ["⭦", "⭡", "⭧", "⭠", "Stop", "⭢", "⭩", "⭣", "⭨"]
 
@@ -62,20 +52,19 @@ class MainFrame(tkinter.Frame):
                         self.main_canvas,
                         text=icons[3 * i + j],
                         command=lambda: print(icons[3 * i + j]),
-                        font=tkinter.font.Font(size=font),
+                        font=("", font),
                     )
                 )
                 self.buttons[3 * i + j].place(
                     x=j * 45 + 15, y=i * 45 + 15, width=45, height=45
                 )
-                print(3 * i + j)
 
         # Create function buttons
         self.btn_home = self.tkButton(
             self.main_canvas,
             text="Home",
             command=lambda: print("Home"),
-            font=tkinter.font.Font(size=11),
+            font=("", 11),
         )
         self.btn_home.place(x=175, y=15 + 7, width=75, height=30)
 
@@ -83,7 +72,7 @@ class MainFrame(tkinter.Frame):
             self.main_canvas,
             text="Square",
             command=lambda: print("Draw Square"),
-            font=tkinter.font.Font(size=11),
+            font=("", 11),
         )
         self.btn_square.place(x=175, y=60 + 7, width=75, height=30)
 
@@ -91,7 +80,7 @@ class MainFrame(tkinter.Frame):
             self.main_canvas,
             text="Diamond",
             command=lambda: print("Draw Diamond"),
-            font=tkinter.font.Font(size=11),
+            font=("", 11),
         )
         self.btn_diamond.place(x=175, y=105 + 7, width=75, height=30)
 
@@ -99,7 +88,7 @@ class MainFrame(tkinter.Frame):
             self.main_canvas,
             text="Draw",
             command=lambda: print("Draw Diamond"),
-            font=tkinter.font.Font(size=11),
+            font=("", 11),
         )
         self.btn_draw.place(x=325, y=200, width=55, height=30)
 
@@ -107,182 +96,107 @@ class MainFrame(tkinter.Frame):
             self.main_canvas,
             text="Clear",
             command=lambda: self.drawing.delete("all"),
-            font=tkinter.font.Font(size=11),
+            font=("", 11),
         )
-        self.btn_clear.place(x=325, y=245, width=55, height=30)
+        self.btn_clear.place(x=390, y=200, width=55, height=30)
 
         # Create labels
         self.lbl_encoders = self.tkLabel(
-            self.main_canvas, text="Encoder Values:", font=tkinter.font.Font(size=11)
+            self.main_canvas, text="Encoder Values:", font=("", 11)
         )
         self.lbl_encoders.place(x=275, y=15, width=105, height=25)
 
-        self.lbl_encoder_vals = self.tkLabel(self.main_canvas, text="PLACEHOLDER")
-        self.lbl_encoder_vals.place(x=275, y=45, width=95, height=55)
+        self.lbl_encoder_vals = self.tkLabel(
+            self.main_canvas, text="PLACEHOLDER", font=("", 10)
+        )
+        self.lbl_encoder_vals.place(x=275, y=40, width=95, height=30)
 
         self.lbl_lasers = self.tkLabel(
-            self.main_canvas, text="Laser Values: ", font=tkinter.font.Font(size=11)
+            self.main_canvas, text="Laser Values: ", font=("", 11)
         )
         self.lbl_lasers.place(x=425, y=15, width=95, height=25)
 
-        self.lbl_laser_vals = self.tkLabel(self.main_canvas, text="PLACEHOLDER")
-        self.lbl_laser_vals.place(x=430, y=45, width=95, height=25)
+        self.lbl_laser_vals = self.tkLabel(
+            self.main_canvas, text="PLACEHOLDER", font=("", 10)
+        )
+        self.lbl_laser_vals.place(x=430, y=40, width=95, height=30)
 
-    def create_components(self):
-        """
-        Creates all of the components and places them in their location on the GUI.
-        """
+        self.lbl_output_voltage = self.tkLabel(
+            self.main_canvas, text="Motor Voltage: ", font=("", 11)
+        )
+        self.lbl_output_voltage.place(x=275, y=85, width=95, height=20)
 
-        # Main canvas that contains all components
-        self.main_canvas = tkinter.Canvas(
-            master=self,
+        # Create voltage slider
+        self.sldr_voltage = tkinter.Scale(
+            self.main_canvas,
+            orient=tkinter.HORIZONTAL,
+            bg=Settings.BG_COLOR,
+            fg="#FFFFFF",
+            borderwidth=0,
+            resolution=0.5,
+            relief=tkinter.FLAT,
+            highlightthickness=0,
+        )
+        self.sldr_voltage.set(Settings.MOTOR_VOLTAGE_DEFAULT)
+        self.sldr_voltage.place(x=275, y=105, width=275, height=45)
+
+    def create_visualization_frame(self):
+        self.frame_visualization = tkinter.Canvas(
+            master=self.main_canvas,
             bg=Settings.BG_COLOR,
             highlightthickness=0,
-            height=Settings.HEIGHT,
-            width=Settings.WIDTH,
+            height=Settings.HEIGHT / 3 + 50,
+            width=Settings.WIDTH / 3 + 25,
         )
-        self.main_canvas.place(anchor=tkinter.CENTER, relx=0.5, rely=0.5)
+        self.frame_visualization.place(
+            x=Settings.WIDTH / 2 + 40, y=Settings.HEIGHT / 2 - 50
+        )
 
-        # Create plotter
-        self.plotter = Plotter(self.main_canvas)
-        self.plot = self.plotter.plot(self.main_canvas)
-        self.plot.draw()
-        self.plot.get_tk_widget().place(relx=0, rely=0.5, relwidth=1, relheight=0.5)
+        # Left rail
+        self.frame_visualization.create_rectangle(
+            0, 0, 15, Settings.HEIGHT / 3 + 49, fill="#c8c8c8"
+        )
+        # Right rail
+        self.frame_visualization.create_rectangle(
+            Settings.WIDTH / 3 + 9,
+            0,
+            Settings.WIDTH / 3 + 25,
+            Settings.HEIGHT / 3 + 49,
+            fill="#c8c8c8",
+        )
 
-        # Container frame to hold the motor buttons
-        self.button_frame = tkinter.Frame(master=self, bg=Settings.BG_COLOR)
-        self.button_frame.place(relx=0, rely=0, relheight=0.5, relwidth=1)
+        self.vis_gantry = self.frame_visualization.create_rectangle(
+            0,
+            Settings.HEIGHT / 3 + 34,
+            Settings.WIDTH / 3 + 25,
+            Settings.HEIGHT / 3 + 50,
+            fill="#c8c8c8",
+        )
 
-        # Container to hold the left motor buttons and labels
-        self.motor_left = tkinter.Canvas(
-            master=self.button_frame,
-            bg=Settings.BG_COLOR,
+    def create_drawing_frame(self):
+        self.drawing = tkinter.Canvas(
+            master=self.main_canvas,
+            bg="white",
             highlightthickness=0,
-            height=Settings.CANVAS_SIZE / 2,
-            width=Settings.CANVAS_SIZE,
+            height=Settings.HEIGHT / 2,
+            width=Settings.WIDTH / 2,
         )
-        self.motor_left.place(relx=0, rely=0.125, relheight=0.5, relwidth=0.5)
+        self.drawing.place(x=15, y=Settings.WIDTH / 2 - 100)
 
-        # Left motor title label
-        self.lbl_motor_left = self.tkLabel(master=self.motor_left, text="Left Motor")
-        self.lbl_motor_left.place(anchor=tkinter.N, relx=0.5)
+        def draw_line(self, event):
+            self.line_points.extend((event.x, event.y))
+            if self.line_id is not None:
+                self.drawing.delete(self.line_id)
+            self.line_id = self.drawing.create_line(
+                self.line_points, **self.line_options
+            )
 
-        # Left motor clockwise button
-        self.btn_motor_left_CW = self.tkButton(
-            self.motor_left, text="CW", command=lambda: print("left CW")
-        )
-        left_pos = 100
-        self.btn_motor_left_CW.place(x=left_pos, y=35, width=45, height=45)
+        def set_start(self, event):
+            self.line_points.extend((event.x, event.y))
 
-        # Left motor counterclockwise button
-        self.btn_motor_left_CCW = self.tkButton(
-            self.motor_left, text="CCW", command=lambda: print("left CCW")
-        )
-        self.btn_motor_left_CCW.place(x=left_pos + 55, y=35, width=45, height=45)
-
-        # Left motor encoder label
-        self.lbl_encoder_left = self.tkLabel(self.motor_left, text="Encoder Value: ")
-        self.lbl_encoder_left.place(relx=0.25, y=100)
-
-        # Left motor encoder value label
-        self.lbl_encoder_left_val = self.tkLabel(
-            self.motor_left, text=f"{self.parent.get_encoder_vals()}"
-        )
-        self.lbl_encoder_left_val.place(x=175, y=100)
-
-        # Left motor voltage label
-        self.lbl_voltage_left = self.tkLabel(self.motor_left, text="Voltage: ")
-        self.lbl_voltage_left.place(relx=0.25, y=125)
-
-        # Left motor voltage value label
-        self.lbl_voltage_left_val = self.tkLabel(
-            self.motor_left, text=f"{self.parent.get_encoder_vals()} V"
-        )
-        self.lbl_voltage_left_val.place(x=175, y=125)
-
-        # Left motor laser label
-        self.lbl_laser_left = self.tkLabel(self.motor_left, text="Laser Value: ")
-        self.lbl_laser_left.place(relx=0.25, y=150)
-
-        # Left motor laser value label
-        self.lbl_laser_left_val = self.tkLabel(
-            self.motor_left, text=f"{self.parent.get_encoder_vals()}"
-        )
-        self.lbl_laser_left_val.place(x=175, y=150)
-
-        # Container to hold the right motor buttons and labels
-        self.motor_right = tkinter.Canvas(
-            master=self.button_frame,
-            bg=Settings.BG_COLOR,
-            highlightthickness=0,
-            height=Settings.CANVAS_SIZE / 2,
-            width=Settings.CANVAS_SIZE,
-        )
-        self.motor_right.place(relx=0.5, rely=0.125, relheight=0.5, relwidth=0.5)
-
-        # Right motor title label
-        self.lbl_motor_right = self.tkLabel(self.motor_right, text="Right Motor")
-        self.lbl_motor_right.place(anchor=tkinter.N, relx=0.5)
-
-        # Right motor clockwise button
-        self.btn_motor_right_CW = self.tkButton(
-            self.motor_right, text="CW", command=lambda: print("right CW")
-        )
-        pos_right = 100
-        self.btn_motor_right_CW.place(x=pos_right, y=35, width=45, height=45)
-
-        # Right motor counterclockwise button
-        self.btn_motor_right_CCW = self.tkButton(
-            self.motor_right, text="CCW", command=lambda: print("right CCW")
-        )
-        self.btn_motor_right_CCW.place(x=pos_right + 55, y=35, width=45, height=45)
-
-        # Right encoder label
-        self.lbl_encoder_right = self.tkLabel(self.motor_right, text="Encoder Value: ")
-        self.lbl_encoder_right.place(relx=0.25, y=100)
-
-        # Right encoder value label
-        self.lbl_encoder_right_val = self.tkLabel(
-            self.motor_right, text=f"{self.parent.get_encoder_vals()}"
-        )
-        self.lbl_encoder_right_val.place(x=175, y=100)
-
-        # Right motor voltage label
-        self.lbl_voltage_right = self.tkLabel(self.motor_right, text="Voltage: ")
-        self.lbl_voltage_right.place(relx=0.25, y=125)
-
-        # Right motor voltage value label
-        self.lbl_voltage_right_val = self.tkLabel(
-            self.motor_right, text=f"{self.parent.get_encoder_vals()} V"
-        )
-        self.lbl_voltage_right_val.place(x=175, y=125)
-
-        # Stop button
-        self.btn_stop = self.tkButton(
-            self.button_frame, text="Stop", command=lambda: print("Stop")
-        )
-        self.btn_stop.place(x=275, y=73, width=45, height=45)
-
-    def update_plot(self, y):
-        self.plotter.update(y)
-        self.plot = self.plotter.plot(self.main_canvas)
-        self.plot.draw()
-        self.plot.get_tk_widget().place(relx=0, rely=0.5, relwidth=1, relheight=0.5)
-
-    def both(self):
-        volt_out(1, 0, 1)
-        volt_out(1, 1, 1)
-
-    def set_button_functions(self):
-        """
-        Binds the GUI buttons to their respective functions.
-        """
-        # self.btn_motor_left_CW.config(command=lambda: set_output_voltage(1, 0, 0.1))
-        self.btn_motor_left_CW.config(command=lambda: volt_out(1, 0, 2))
-        self.btn_motor_left_CCW.config(command=lambda: volt_out(1, 0, -2))
-        self.btn_motor_right_CW.config(command=lambda: volt_out(1, 1, 2))
-        self.btn_motor_right_CCW.config(command=lambda: volt_out(1, 1, -2))
-        self.btn_stop.config(command=move.stop_motors)
+        def end_line(self, event=None):
+            self.line_points.clear()
+            self.line_id = None
 
     def tkLabel(self, *args, **kwargs):
         """Simplifies creating labels with the same standard attributes"""

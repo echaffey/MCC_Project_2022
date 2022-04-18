@@ -2,6 +2,7 @@ from typing import Union
 
 from mcculw import ul
 
+# Import libraries included with this project
 from device_io.analog_in import get_analog_input
 from device_io.wrapper_new import cb_C7266_config
 
@@ -23,10 +24,13 @@ class MotorEncoder:
         cb_C7266_config is a custom written C wrapper which is not included in the
         MCC Universal Library code due to the board no longer being supported.
         """
-        # Initialize encoder board
+
+        # Configure the 4 channels of the QUAD04 Encoder
+        # Encoders are set to unsigned short and output values 0 to 65536
+        # Quadrature value of 4 is highest resolution
         cb_C7266_config(0, 1, 4, 0, 2, 0, 0, 1, 0)
         cb_C7266_config(0, 2, 4, 0, 2, 0, 0, 1, 0)
-        cb_C7266_config(0, 3, 0, 0, 2, 0, 0, 1, 0)
+        cb_C7266_config(0, 3, 4, 0, 2, 0, 0, 1, 0)
         cb_C7266_config(0, 4, 0, 0, 2, 0, 0, 1, 0)
 
     def get_counter_value(self, counter_num: int) -> int:
@@ -54,7 +58,7 @@ class MotorEncoder:
 
         return vals
 
-    def zero_counter(self, counter_num: int):
+    def zero_counter(self, counter_num: int) -> None:
         """UNIMPLEMENTED. NOT SUPPORTED BY THIS BOARD"""
         ul.c_clear(self.board_num, counter_num)
 
@@ -65,9 +69,11 @@ class LaserSensor:
     """
 
     def __init__(self, board_num: int, channel_num: int):
+
+        # Stores the board and channel number for the device
         self.board_num = board_num
         self.channel_num = channel_num
 
     def read_laser_value(self) -> Union[int, int]:
-        """Returns the value and engineering value from the laser"""
+        """Returns the value and engineering value (voltage) from the laser"""
         return get_analog_input(self.board_num, self.channel_num)

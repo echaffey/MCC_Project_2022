@@ -60,7 +60,6 @@ class DiscoverDevice:
             BoardInfo.DACRANGE,
             ULRange.BIP10VOLTS,
         )
-        # print(ul.get_config(InfoType.BOARDINFO, 1, 0, BoardInfo.DACRES))
 
         return self.get_devices()
 
