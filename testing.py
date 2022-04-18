@@ -28,9 +28,30 @@ class App(tkinter.Tk):
         self.minsize(Settings.WIDTH, Settings.HEIGHT)
         self.maxsize(Settings.MAX_WIDTH, Settings.MAX_HEIGHT)
 
+        self.line_id = None
+        self.line_points = []
+        self.line_options = {}
+
+        self.drawing.bind('<Button-1>', self.set_start)
+        self.drawing.bind('<B1-Motion>', self.draw_line)
+        self.drawing.bind('<ButtonRelease-1>', self.end_line)
+
         self.mainloop()
 
         # self.main_frame.place(relx=0, rely=0, relheight=1, relwidth=1)
+
+    def draw_line(self, event):
+        self.line_points.extend((event.x, event.y))
+        if self.line_id is not None:
+            self.drawing.delete(self.line_id)
+        self.line_id = self.drawing.create_line(self.line_points, **self.line_options)
+
+    def set_start(self, event):
+        self.line_points.extend((event.x, event.y))
+
+    def end_line(self, event=None):
+        self.line_points.clear()
+        self.line_id = None
 
     def tkButton(self, *args, **kwargs):
         """Simplifies creating buttons with the same standard attributes"""
@@ -47,6 +68,15 @@ class App(tkinter.Tk):
             width=Settings.WIDTH,
         )
         self.main_canvas.place(anchor=tkinter.CENTER, relx=0.5, rely=0.5)
+
+        self.drawing = tkinter.Canvas(
+            master=self.main_canvas,
+            bg='white',
+            highlightthickness=0,
+            height=Settings.HEIGHT / 2,
+            width=Settings.WIDTH / 2,
+        )
+        self.drawing.place(x=0, y=Settings.WIDTH / 2 - 100)
 
         # Container frame to hold the motor buttons
         # self.button_frame = tkinter.Frame(master=self, bg=Settings.BG_COLOR)
@@ -97,6 +127,16 @@ class App(tkinter.Tk):
             self.main_canvas, text='Diamond', command=lambda: print('Draw Diamond')
         )
         self.btn_diamond.place(x=175, y=105 + 7, width=75, height=30)
+
+        self.btn_draw = self.tkButton(
+            self.main_canvas, text='Draw', command=lambda: print('Draw Diamond')
+        )
+        self.btn_draw.place(x=325, y=200, width=55, height=30)
+
+        self.btn_clear = self.tkButton(
+            self.main_canvas, text='Clear', command=lambda: self.drawing.delete('all')
+        )
+        self.btn_clear.place(x=325, y=245, width=55, height=30)
 
 
 if __name__ == '__main__':
