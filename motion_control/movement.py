@@ -24,6 +24,18 @@ class Speed:
 To create new shapes or movement patterns, define them as a function in here."""
 
 
+def get_position(d_phi_1: float, d_phi_2: float):
+
+    radius = Settings.PULLEY_RADIUS
+    phi = np.array([d_phi_1, d_phi_2])
+
+    A = np.array([[-0.5, 0.5], [-0.5, -0.5]]) * radius
+
+    dx, dy = A.dot(phi)
+
+    return dx, dy
+
+
 def stop_motors():
     """
     Stops all voltage output to the motors.

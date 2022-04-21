@@ -23,14 +23,24 @@ class Settings:
     MOTOR_VOLTAGE_ALLOWABLE: float = 5.0  # Maximum allowable voltage to the motor
     MOTOR_VOLTAGE_DEFAULT: float = 3.0  # Default motor voltage output value
 
-    ENCODER_RESOLUTION: int = 2**16 - 1  # 16-bit values
-
     # These are the channels on the physical board
     MOTOR_1_CHANNEL: int = 0
     MOTOR_2_CHANNEL: int = 1
 
     LASER_1_CHANNEL: int = 0
     LASER_2_CHANNEL: int = 1
+
+    """
+    Kinematics
+    ---------------------------------------------------------------------------------------------
+    """
+
+    MOTOR_GEAR_RATIO: float = 5.9  # 5.9:1 gear reduction ratio
+
+    PULLEY_RADIUS: float = 0.75  # inches
+
+    ENCODER_VALUES: int = 2**16 - 1  # 16-bit values
+    ENCODER_RESOLUTION: int = 512  # Lines per one revolution of the motor shaft
 
     """
     GUI Settings
