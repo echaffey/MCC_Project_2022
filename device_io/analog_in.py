@@ -3,11 +3,21 @@ from mcculw.enums import ULRange
 from mcculw.ul import ULError, win_buf_alloc, win_buf_free
 from mcculw.device_info import DaqDeviceInfo
 
-# from discover import DiscoverDevice
-
 
 def get_analog_input(board_num: int, channel: int):
+    """
+    Reads the analog input signal from the device's `board_num` on the board's input `channel`.
 
+    Args:
+        board_num (int): Instacal defined board number for the input device.
+        channel (int): Input channel to read from.
+
+    Raises:
+        Exception: If the board that you're trying to connect to does not exists.
+
+    Returns:
+        (value, eng_units): Returns the bit value and its equivalent engineering units.
+    """
     try:
         device = DaqDeviceInfo(board_num)
     except Exception as e:
@@ -41,7 +51,5 @@ def get_analog_input(board_num: int, channel: int):
         value = ul.a_in_32(board_num, channel, ai_range)
         # Convert the raw value to engineering units
         eng_units_value = ul.to_eng_units_32(board_num, ai_range, value)
-
-    # value = ul.a_in_scan(board_num, 0, 10, 1,10,ai_range, win_buf_alloc(8), 32)
 
     return value, eng_units_value

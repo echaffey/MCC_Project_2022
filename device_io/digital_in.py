@@ -48,7 +48,3 @@ def get_digital_input(board_num: int = 0, bit_number: int = 0):
     bit_value = ul.d_bit_in(board_num, port.type, bit_num)
 
     return bit_value, port_value
-
-
-if __name__ == "__main__":
-    print(get_digital_input(1))

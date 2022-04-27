@@ -1,19 +1,39 @@
-from dataclasses import dataclass
-from device_io.v_out import volt_out
-from settings import Settings
+# Built in python libraries
 import time
-
 import numpy as np
+from dataclasses import dataclass
 
+# libraries from this project
+from settings import Settings
+from device_io.v_out import volt_out
+
+
+# Read the board and channel numbers for the motors as defined in the settings.py file
 motor_board_num = Settings.DAC_BOARD_NUM
 motor_1 = Settings.MOTOR_1_CHANNEL
 motor_2 = Settings.MOTOR_2_CHANNEL
 
-
+# A way to store how fast the motor is currently moving based on the voltage
 @dataclass
 class Speed:
-    speed_1 = 0.5
-    speed_2 = 0.5
+    speed_1 = 0.0
+    speed_2 = 0.0
+
+
+"""This file defines all of the movement functions for the system. 
+To create new shapes or movement patterns, define them as a function in here."""
+
+
+def get_position(d_phi_1: float, d_phi_2: float):
+
+    radius = Settings.PULLEY_RADIUS
+    phi = np.array([d_phi_1, d_phi_2])
+
+    A = np.array([[-0.5, 0.5], [-0.5, -0.5]]) * radius
+
+    dx, dy = A.dot(phi)
+
+    return dx, dy
 
 
 def stop_motors():
@@ -40,7 +60,7 @@ def neg_X(voltage: float):
     stop_motors()
     Speed.speed_1 = voltage
     Speed.speed_2 = -voltage
-    # print(speed_1, speed_2)
+
     volt_out(motor_board_num, motor_1, voltage)
     volt_out(motor_board_num, motor_2, -voltage)
 
@@ -117,12 +137,11 @@ def sw(voltage: float):
     Speed.speed_2 = 0
 
     volt_out(motor_board_num, motor_2, -Speed.speed_1)
-    # volt_out(motor_board_num, motor_2, -Speed.speed_2)
 
 
 def slow_pos_y(sensor_input: float, volts: float):
     v_out = abs(sensor_input / 10) * volts
-    print(v_out)
+
     volt_out(motor_board_num, motor_1, v_out)
     volt_out(motor_board_num, motor_2, v_out)
 
@@ -130,7 +149,6 @@ def slow_pos_y(sensor_input: float, volts: float):
 def adjust_speed(sensor_input: float):
     v_out = abs(sensor_input / 10) * Speed.speed_1
 
-    print(Speed.speed_1, v_out)
     volt_out(motor_board_num, motor_1, v_out)
     volt_out(motor_board_num, motor_2, v_out)
 

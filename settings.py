@@ -4,7 +4,10 @@ from dataclasses import dataclass
 @dataclass
 class Settings:
     """
-    H-Frame positioner global application configuration
+    H-Frame positioner global application configuration.
+
+    Change the variable values in this file to modify how the program runs, which
+    board numbers the devices are on and which channels each sensor is on.
     """
 
     """
@@ -16,16 +19,28 @@ class Settings:
     DAC_BOARD_NUM: int = 1  # USB_3101 board
     ADC_BOARD_NUM: int = 2  # USB-1408FS board
 
-    MOTOR_VOLTAGE_MAX: int = 10  # Maximum allowable bipolar voltage allowed
-    MOTOR_VOLTAGE_OUT: float = 3.0  # Default motor voltage output value
+    MOTOR_VOLTAGE_MAX: int = 10  # Maximum possible bipolar voltage allowed
+    MOTOR_VOLTAGE_ALLOWABLE: float = 5.0  # Maximum allowable voltage to the motor
+    MOTOR_VOLTAGE_DEFAULT: float = 3.0  # Default motor voltage output value
 
-    ENCODER_RESOLUTION: int = 0
-
+    # These are the channels on the physical board
     MOTOR_1_CHANNEL: int = 0
     MOTOR_2_CHANNEL: int = 1
 
     LASER_1_CHANNEL: int = 0
     LASER_2_CHANNEL: int = 1
+
+    """
+    Kinematics
+    ---------------------------------------------------------------------------------------------
+    """
+
+    MOTOR_GEAR_RATIO: float = 5.9  # 5.9:1 gear reduction ratio
+
+    PULLEY_RADIUS: float = 0.75  # inches
+
+    ENCODER_VALUES: int = 2**16 - 1  # 16-bit values
+    ENCODER_RESOLUTION: int = 512  # Lines per one revolution of the motor shaft
 
     """
     GUI Settings
@@ -34,7 +49,7 @@ class Settings:
     WIDTH: int = 600  # window size when starting up the application
     HEIGHT: int = 600
 
-    MAX_WIDTH: int = 800
+    MAX_WIDTH: int = 800  # Maximum allowable window size
     MAX_HEIGHT: int = 800
 
     CANVAS_SIZE: int = 400
@@ -42,13 +57,13 @@ class Settings:
     HZ: int = 60  # Frequency to read from the devices
     TIME_DELTA = 1 / HZ
 
-    BG_COLOR: str = "#444444"
-    BTN_COLOR: str = "#666666"
+    BG_COLOR: str = "#444444"  # Window background color
+    BTN_COLOR: str = "#666666"  # Button color
 
     """General Settings"""
     APP_NAME: str = "H-Frame Positioner GUI"
     VERSION: str = "0.0.1"
-    SPONSOR: str = "Musa Jouaneh"
+    PROFESSOR: str = "Musa Jouaneh"
     AUTHOR: str = "Evan Chaffey"
     ORGANIZATION: str = "University of Rhode Island"
     YEAR: str = "2022"
@@ -59,5 +74,5 @@ class Settings:
     USER_SETTINGS_PATH: str = ""
 
     ABOUT_TEXT: str = (
-        f"{APP_NAME} Version {VERSION} © {YEAR} {SPONSOR}, {AUTHOR}, {ORGANIZATION}"
+        f"{APP_NAME} Version {VERSION} © {YEAR} {PROFESSOR}, {AUTHOR}, {ORGANIZATION}"
     )
