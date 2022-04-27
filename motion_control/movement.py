@@ -1,4 +1,3 @@
-from cmath import cos, sin
 from dataclasses import dataclass
 from device_io.v_out import volt_out
 from settings import Settings
@@ -164,8 +163,8 @@ def draw_diamond(voltage: float):
     Args:
         voltage (float): Voltage to be applied to the motors, in engineering units.
     """
-    time_sleep = np.sqrt(2 * 1.5**2) / voltage
-    print(np.sqrt(2 * 1.5**2))
+    time_sleep = np.sqrt(2 * 1.5 ** 2) / voltage
+    print(np.sqrt(2 * 1.5 ** 2))
     stop_motors()
 
     sw(voltage)

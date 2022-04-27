@@ -7,12 +7,6 @@ from settings import Settings
 from ui_components.frames import MainFrame
 from ui_components.timing import Timer
 
-from device_io.discover import DiscoverDevice
-from device_io.v_out import set_output_voltage, volt_out
-from device_io.digital_in import get_digital_input
-
-from mcculw import ul
-
 from motion_control import movement as move
 
 # from motion.wrapper_new import cb_C7266_config
@@ -44,7 +38,7 @@ class App(tkinter.Tk):
 
         self.main_frame = MainFrame(self)
 
-        self.devices = self.connect_to_devices()
+        # self.devices = self.connect_to_devices()
 
         # Handle window closing event
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
@@ -56,16 +50,6 @@ class App(tkinter.Tk):
         self.draw_main_frame()
 
         self.running = True
-
-    def connect_to_devices(self):
-        """
-        Need to implement a way of organizing
-        board numbers with each device.
-        """
-        # d = DiscoverDevice()
-        # d.search_for_devices()
-
-        pass
 
     def bind_keys(self):
         """Assigns the events to the keyboard keys"""

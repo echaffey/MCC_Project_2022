@@ -4,6 +4,7 @@ from mcculw import ul
 
 from device_io.analog_in import get_analog_input
 from device_io.wrapper_new import cb_C7266_config
+from device_io.digital_in import get_digital_input
 
 
 class MotorEncoder:
@@ -15,12 +16,12 @@ class MotorEncoder:
         # Initialize encoder board
         self.board_num = board_num
 
-        self.configure_parameters()
+        self._configure_board()
 
-    def configure_parameters(self):
+    def _configure_board(self):
         """
         Initializes each of the 4 channels on the encoder board.  The function
-        cb_C7266_config is a custom written C wrapper which is not included in the
+        cb_C7266_config is a custom implementation C wrapper which is not included in the
         MCC Universal Library code due to the board no longer being supported.
         """
         # Initialize encoder board
@@ -61,7 +62,7 @@ class MotorEncoder:
 
 class LaserSensor:
     """
-    Defines a laser measurement sensor device.
+    Defines a laser measurement sensor.
     """
 
     def __init__(self, board_num: int, channel_num: int):
@@ -71,3 +72,37 @@ class LaserSensor:
     def read_laser_value(self) -> Union[int, int]:
         """Returns the value and engineering value from the laser"""
         return get_analog_input(self.board_num, self.channel_num)
+
+
+class LimitSwitches:
+    '''
+    Defines a collection of limit switch sensors.
+    '''
+
+    def __init__(self, board_num: int, bit_nums: list):
+        self.board_num = board_num
+        self.bits = bit_nums
+
+    def is_activated(self, bit_num: int) -> bool:
+        '''
+        Checks to see if a selected limit switch has been triggered.
+
+        Args:
+            channel_num (int): Bit number of the limit switch.
+
+        Returns:
+            bool: True if the switch has been triggered.
+        '''
+        if get_digital_input(self.board_num, bit_num) > 0:
+            return True
+
+        return False
+
+    def read_switches(self) -> list:
+        '''
+        Reads state values from all of the limit switches.
+
+        Returns:
+            list: List of limit switch state values.
+        '''
+        return [get_digital_input(self.board_num, bit) for bit in self.bits]

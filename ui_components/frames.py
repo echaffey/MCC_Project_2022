@@ -3,7 +3,7 @@ from settings import Settings
 
 from ui_components.plotting import Plotter
 
-from device_io.v_out import set_output_voltage, volt_out
+from device_io.v_out import volt_out
 
 from motion_control import movement as move
 
