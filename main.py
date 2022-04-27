@@ -1,6 +1,6 @@
 import os
 import tkinter
-from time import time
+from time import sleep, time
 
 # Import the user defined settings in \settings.py
 from settings import Settings
@@ -8,7 +8,7 @@ from settings import Settings
 # Import from files located in the ...\h_frame_positioner\ folder
 from ui_components.frames import MainWindow
 from motion_control import movement as move
-from motion_control.sensors import LaserSensor, MotorEncoder
+from motion_control.sensors import LaserSensor, LimitSensors, MotorEncoder
 from motion_control.movement import Speed
 
 
@@ -35,6 +35,10 @@ class App(tkinter.Tk):
         self.encoder = MotorEncoder(Settings.ENCODER_BOARD_NUM)
         self.laser_1 = LaserSensor(Settings.ADC_BOARD_NUM, Settings.LASER_1_CHANNEL)
         self.laser_2 = LaserSensor(Settings.ADC_BOARD_NUM, Settings.LASER_2_CHANNEL)
+        self.limit_sensors = LimitSensors(
+            Settings.ADC_BOARD_NUM,
+            Settings.LIMIT_SENSORS,
+        )
 
         # Defines the default value for the motor voltage
         self.motor_voltage = Settings.MOTOR_VOLTAGE_DEFAULT
@@ -50,6 +54,8 @@ class App(tkinter.Tk):
 
         # Display the GUI
         self.draw_main_window()
+
+        self.homing_position = None
 
         self.running = True
 
@@ -89,7 +95,8 @@ class App(tkinter.Tk):
                 self.main_window.buttons[row * 3 + col].config(
                     command=funcs[row * 3 + col]
                 )
-
+        # Set up homing button
+        self.main_window.btn_home.config(command=lambda: self.homing_sequence())
         # Set up shape buttons
         self.main_window.btn_square.config(command=lambda: move.draw_square(v))
         self.main_window.btn_diamond.config(command=lambda: move.draw_diamond(v))
@@ -163,10 +170,81 @@ class App(tkinter.Tk):
             effector, u1, Speed.speed_2 / 5 * y1 / 15
         )
 
+        # Read from the limit switches
+        limit_vals = self.limit_sensors.read_switches()
+
+        # Update limit switch visualizations
+        self.main_window.update_limit_sensor_indicators(limit_vals)
+
+        # Get the current x, y position of the end effector in inches from the origin
+        if self.homing_position is not None:
+            pos1, pos2 = self.get_encoder_vals()[:2]
+            print(
+                move.get_pos(
+                    pos1 - self.homing_position[0], pos2 - self.homing_position[1]
+                )
+            )
+
+    def homing_sequence(self):
+        homing_voltage = 1.5
+        home = False
+
+        move.nw(homing_voltage)
+
+        # Initial position finding
+        while not home:
+            limit_vals = self.limit_sensors.read_switches()
+
+            # If S3 triggered
+            if limit_vals[2]:
+                move.pos_X(homing_voltage)
+
+            # If S4 triggered
+            if limit_vals[3]:
+                move.neg_Y(homing_voltage)
+
+            if limit_vals[2] and limit_vals[3]:
+                home = True
+
+        # Get the current encoder values
+        e_1, e_2 = self.get_encoder_vals()[:2]
+        print("Initial", e_1, e_2)
+        home = False
+
+        move.pos_Y(1)
+        sleep(1)
+        move.neg_Y(0.6)
+
+        while not home:
+            limit_vals = self.limit_sensors.read_switches()
+            if limit_vals[2]:
+                home = True
+                e_1, e_2 = self.get_encoder_vals()[:2]
+                print("Y", e_1, e_2)
+
+        home = False
+
+        move.neg_X(1)
+        sleep(1)
+        move.pos_X(0.6)
+
+        while not home:
+            limit_vals = self.limit_sensors.read_switches()
+            if limit_vals[3]:
+                home = True
+                e_1, e_2 = self.get_encoder_vals()[:2]
+                print("X", e_1, e_2)
+
+        move.stop_motors()
+
+        self.homing_position = (e_1, e_2)
+
     def run(self):
         """Main program loop. This will run at the frequency specified in the settings.py file for HZ"""
 
         start_time = time()
+
+        # self.homing_sequence()
 
         while self.running:
             if time() - start_time >= Settings.TIME_DELTA:

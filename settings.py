@@ -27,8 +27,19 @@ class Settings:
     MOTOR_1_CHANNEL: int = 0
     MOTOR_2_CHANNEL: int = 1
 
+    # Analog channels to which the lasers are connected on the USB-1408FS board
     LASER_1_CHANNEL: int = 0
     LASER_2_CHANNEL: int = 1
+
+    # Digital channels to which the limit switches are connected on the USB-1408FS board
+    LIMIT_PORT: int = 0  # Port A, Port B = 1
+    LIMIT_S1: int = 0  # Limit Sensor 1, Channel 0
+    LIMIT_S2: int = 1  # Limit Sensor 2, Channel 1
+    LIMIT_S3: int = 2  # Limit Sensor 3, Channel 2
+    LIMIT_S4: int = 3  # Limit Sensor 4, Channel 3
+    LIMIT_S5: int = 4  # Limit Sensor 5, Channel 4
+    LIMIT_S6: int = 5  # Limit Sensor 6, Channel 5
+    LIMIT_SENSORS = [LIMIT_S1, LIMIT_S2, LIMIT_S3, LIMIT_S4, LIMIT_S5, LIMIT_S6]
 
     """
     Kinematics
@@ -41,6 +52,10 @@ class Settings:
 
     ENCODER_VALUES: int = 2**16 - 1  # 16-bit values
     ENCODER_RESOLUTION: int = 512  # Lines per one revolution of the motor shaft
+    QUADRATURE: int = 4
+    ENCODER_VALS_PER_REV: int = (
+        ENCODER_RESOLUTION * QUADRATURE * MOTOR_GEAR_RATIO
+    )  # Number of encoder values per revolution
 
     """
     GUI Settings

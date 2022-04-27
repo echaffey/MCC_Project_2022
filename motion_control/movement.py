@@ -36,6 +36,24 @@ def get_position(d_phi_1: float, d_phi_2: float):
     return dx, dy
 
 
+def get_pos(encoder_val_1, encoder_val_2):
+
+    radius = Settings.PULLEY_RADIUS
+
+    revolutions_1 = encoder_val_1 / Settings.ENCODER_VALS_PER_REV
+    revolutions_2 = encoder_val_2 / Settings.ENCODER_VALS_PER_REV
+    phi_1 = revolutions_1 * 2 * np.pi
+    phi_2 = revolutions_2 * 2 * np.pi
+
+    phi = np.array([phi_1, phi_2])
+
+    A = np.array([[-0.5, 0.5], [-0.5, -0.5]]) * radius
+
+    dx, dy = A.dot(phi)
+
+    return dx, dy
+
+
 def stop_motors():
     """
     Stops all voltage output to the motors.
@@ -46,7 +64,7 @@ def stop_motors():
     volt_out(motor_board_num, motor_2, 0)
 
 
-def pos_X(voltage: float):
+def pos_X(voltage: float) -> None:
     """Moves the end effector in the defined positive x direction."""
     stop_motors()
     Speed.speed_1 = -voltage
@@ -55,7 +73,7 @@ def pos_X(voltage: float):
     volt_out(motor_board_num, motor_2, voltage)
 
 
-def neg_X(voltage: float):
+def neg_X(voltage: float) -> None:
     """Moves the end effector in the defined negative x direction."""
     stop_motors()
     Speed.speed_1 = voltage
@@ -65,7 +83,7 @@ def neg_X(voltage: float):
     volt_out(motor_board_num, motor_2, -voltage)
 
 
-def pos_Y(voltage: float):
+def pos_Y(voltage: float) -> None:
     """Moves the end effector in the defined positive y direction."""
     stop_motors()
     Speed.speed_1 = voltage
@@ -74,7 +92,7 @@ def pos_Y(voltage: float):
     volt_out(motor_board_num, motor_2, voltage)
 
 
-def neg_Y(voltage: float):
+def neg_Y(voltage: float) -> None:
     """Moves the end effector in the defined negative x direction."""
     stop_motors()
     Speed.speed_1 = -voltage
@@ -83,9 +101,10 @@ def neg_Y(voltage: float):
     volt_out(motor_board_num, motor_2, -voltage)
 
 
-def ne(voltage: float):
+def ne(voltage: float) -> None:
     """
     Moves the end effector in the northeast direction (+X, -Y)
+    This is counter-clockwise rotation of Motor 2
 
     Args:
         voltage (float): Voltage to apply, in engineering units.
@@ -97,9 +116,10 @@ def ne(voltage: float):
     volt_out(motor_board_num, motor_2, Speed.speed_1)
 
 
-def se(voltage: float):
+def se(voltage: float) -> None:
     """
     Moves the end effector in the southeast direction (-X, -Y)
+    This is counter-clockwise rotation of Motor 1
 
     Args:
         voltage (float): Voltage to apply, in engineering units.
@@ -111,9 +131,10 @@ def se(voltage: float):
     volt_out(motor_board_num, motor_1, Speed.speed_1)
 
 
-def nw(voltage: float):
+def nw(voltage: float) -> None:
     """
     Moves the end effector in the northwest direction (+X, +Y)
+    This is clockwise rotation of Motor 1
 
     Args:
         voltage (float): Voltage to apply, in engineering units.
@@ -125,9 +146,10 @@ def nw(voltage: float):
     volt_out(motor_board_num, motor_1, -Speed.speed_1)
 
 
-def sw(voltage: float):
+def sw(voltage: float) -> None:
     """
     Moves the end effector in the southwest direction (-X, -Y)
+    This is clockwise rotation of Motor 2
 
     Args:
         voltage (float): Voltage to apply, in engineering units.
@@ -146,14 +168,14 @@ def slow_pos_y(sensor_input: float, volts: float):
     volt_out(motor_board_num, motor_2, v_out)
 
 
-def adjust_speed(sensor_input: float):
+def adjust_speed(sensor_input: float) -> None:
     v_out = abs(sensor_input / 10) * Speed.speed_1
 
     volt_out(motor_board_num, motor_1, v_out)
     volt_out(motor_board_num, motor_2, v_out)
 
 
-def draw_square(voltage: float):
+def draw_square(voltage: float) -> None:
     """
     Moves the end effector in a square pattern.
 
@@ -174,15 +196,15 @@ def draw_square(voltage: float):
     stop_motors()
 
 
-def draw_diamond(voltage: float):
+def draw_diamond(voltage: float) -> None:
     """
     Moves the end effector in a diamond pattern.
 
     Args:
         voltage (float): Voltage to be applied to the motors, in engineering units.
     """
-    time_sleep = np.sqrt(2 * 1.5 ** 2) / voltage
-    print(np.sqrt(2 * 1.5 ** 2))
+    time_sleep = np.sqrt(2 * 1.5**2) / voltage
+    print(np.sqrt(2 * 1.5**2))
     stop_motors()
 
     sw(voltage)

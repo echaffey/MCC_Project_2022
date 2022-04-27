@@ -20,6 +20,7 @@ class MainWindow(tkinter.Frame):
         self.create_components()
         self.create_drawing_frame()
         self.create_visualization_frame()
+        self.create_limit_sensor_indicators()
 
     def create_components(self):
 
@@ -61,7 +62,10 @@ class MainWindow(tkinter.Frame):
 
         # Create function buttons
         self.btn_home = self.tkButton(
-            self.main_canvas, text="Home", command=lambda: print("Home"), font=("", 11),
+            self.main_canvas,
+            text="Home",
+            command=lambda: print("Home"),
+            font=("", 11),
         )
         self.btn_home.place(x=175, y=15 + 7, width=75, height=30)
 
@@ -172,8 +176,88 @@ class MainWindow(tkinter.Frame):
 
         x1, y1, x2, y2 = self.frame_visualization.coords(self.vis_gantry)
         self.vis_effector = self.frame_visualization.create_rectangle(
-            0, y1 - 5, 25, y1 + 20, fill="#000000",
+            0,
+            y1 - 5,
+            25,
+            y1 + 20,
+            fill="#000000",
         )
+
+    def create_limit_sensor_indicators(self):
+        # Circle radius
+        r = 6
+
+        # Sensor 1
+        self.S1 = self.frame_visualization.create_oval(
+            4, 12, 4 + r, 12 + r, fill="#2e0106"
+        )
+
+        # Sensor 2
+        self.S2 = self.frame_visualization.create_oval(
+            25,
+            (Settings.HEIGHT / 3 + 49) / 2,
+            25 + r,
+            (Settings.HEIGHT / 3 + 49) / 2 + r,
+            fill="#2e0106",
+        )
+
+        # Sensor 3
+        self.S3 = self.frame_visualization.create_oval(
+            190,
+            (Settings.HEIGHT / 3 + 49) / 2,
+            190 + r,
+            (Settings.HEIGHT / 3 + 49) / 2 + r,
+            fill="#2e0106",
+        )
+
+        # Sensor 4
+        self.S4 = self.frame_visualization.create_oval(
+            214,
+            230,
+            214 + r,
+            230 + r,
+            fill="#2e0106",
+        )
+
+        # Sensor 5
+        self.S6 = self.frame_visualization.create_oval(
+            214,
+            12,
+            214 + r,
+            12 + r,
+            fill="#2e0106",
+        )
+
+        # Sensor 6
+        self.S5 = self.frame_visualization.create_oval(
+            4,
+            230,
+            4 + r,
+            230 + r,
+            fill="#2e0106",
+        )
+
+        # List of all sensors
+        self.limit_sensor_indicators = [
+            self.S1,
+            self.S2,
+            self.S3,
+            self.S4,
+            self.S5,
+            self.S6,
+        ]
+
+    def update_limit_sensor_indicators(self, sensor_vals: list):
+
+        for i, sensor_val in enumerate(sensor_vals):
+            if sensor_val > 0:
+                self.frame_visualization.itemconfig(
+                    self.limit_sensor_indicators[i], fill="#ff0019"
+                )
+            else:
+                self.frame_visualization.itemconfig(
+                    self.limit_sensor_indicators[i], fill="#2e0106"
+                )
 
     def create_drawing_frame(self):
         self.drawing = tkinter.Canvas(

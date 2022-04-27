@@ -80,17 +80,18 @@ class LaserSensor:
         return get_analog_input(self.board_num, self.channel_num)
 
 
-class LimitSwitches:
-    '''
+class LimitSensors:
+    """
     Defines a collection of limit switch sensors.
-    '''
+    """
 
-    def __init__(self, board_num: int, bit_nums: list):
+    def __init__(self, board_num: int, channel_nums: list, port_num: int = 0):
         self.board_num = board_num
-        self.bits = bit_nums
+        self.channels = channel_nums
+        self.port_num = port_num
 
-    def is_activated(self, bit_num: int) -> bool:
-        '''
+    def is_activated(self, channel_num: int) -> bool:
+        """
         Checks to see if a selected limit switch has been triggered.
 
         Args:
@@ -98,17 +99,29 @@ class LimitSwitches:
 
         Returns:
             bool: True if the switch has been triggered.
-        '''
-        if get_digital_input(self.board_num, bit_num) > 0:
+        """
+        if (
+            get_digital_input(
+                board_num=self.board_num,
+                bit_number=channel_num,
+                port=self.port_num,
+            )
+            > 0
+        ):
             return True
 
         return False
 
     def read_switches(self) -> list:
-        '''
+        """
         Reads state values from all of the limit switches.
 
         Returns:
             list: List of limit switch state values.
-        '''
-        return [get_digital_input(self.board_num, bit) for bit in self.bits]
+        """
+        return [
+            get_digital_input(
+                board_num=self.board_num, bit_number=channel, port=self.port_num
+            )[0]
+            for channel in self.channels
+        ]

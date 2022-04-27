@@ -3,7 +3,7 @@ from mcculw.enums import DigitalIODirection
 from mcculw.device_info import DaqDeviceInfo
 
 
-def get_digital_input(board_num: int = 0, bit_number: int = 0):
+def get_digital_input(board_num: int = 0, bit_number: int = 0, port: int = None):
     """
     Reads the digital input on a given bit from an A2D board.
 
@@ -28,8 +28,9 @@ def get_digital_input(board_num: int = 0, bit_number: int = 0):
     # Get the supported range of values and set the channel to use
     dio_info = device.get_dio_info()
 
-    # Find the first port that supports input, defaults to None if nothing is found.
-    port = next((port for port in dio_info.port_info if port.supports_input), None)
+    if not port:
+        # Find the first port that supports input, defaults to None if nothing is found.
+        port = next((port for port in dio_info.port_info if port.supports_input), None)
 
     if not port:
         raise Exception(
