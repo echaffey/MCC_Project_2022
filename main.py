@@ -179,11 +179,17 @@ class App(tkinter.Tk):
         # Get the current x, y position of the end effector in inches from the origin
         if self.homing_position is not None:
             pos1, pos2 = self.get_encoder_vals()[:2]
-            print(
-                move.get_pos(
-                    pos1 - self.homing_position[0], pos2 - self.homing_position[1]
-                )
-            )
+
+            # TODO: Need to figure out how to account for the counter rolling over back to 0
+            if pos1 < self.homing_position[0]:
+                pass
+
+            # print(
+            #     move.get_pos(
+            #         pos1 - self.homing_position[0], pos2 - self.homing_position[1]
+            #     )
+            # )
+            print(pos1 - self.homing_position[0], pos2 - self.homing_position[1])
 
     def homing_sequence(self):
         homing_voltage = 1.5
@@ -194,6 +200,8 @@ class App(tkinter.Tk):
         # Initial position finding
         while not home:
             limit_vals = self.limit_sensors.read_switches()
+            self.update_GUI()
+            self.update()
 
             # If S3 triggered
             if limit_vals[2]:
@@ -217,6 +225,9 @@ class App(tkinter.Tk):
 
         while not home:
             limit_vals = self.limit_sensors.read_switches()
+            self.update_GUI()
+            self.update()
+
             if limit_vals[2]:
                 home = True
                 e_1, e_2 = self.get_encoder_vals()[:2]
@@ -230,6 +241,9 @@ class App(tkinter.Tk):
 
         while not home:
             limit_vals = self.limit_sensors.read_switches()
+            self.update_GUI()
+            self.update()
+
             if limit_vals[3]:
                 home = True
                 e_1, e_2 = self.get_encoder_vals()[:2]
