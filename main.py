@@ -181,15 +181,31 @@ class App(tkinter.Tk):
             pos1, pos2 = self.get_encoder_vals()[:2]
 
             # TODO: Need to figure out how to account for the counter rolling over back to 0
+            # If current position is < home position
             if pos1 < self.homing_position[0]:
-                pass
+
+                pos1 = Settings.ENCODER_VALUES - self.homing_position[0] + pos1
+
+            else:
+                pos1 = pos1 - self.homing_position[0]
+
+            if pos2 < self.homing_position[1]:
+                pos2 = Settings.ENCODER_VALUES - self.homing_position[1] + pos2
+
+            else:
+                pos2 = pos2 - self.homing_position[1]
+
+            print(move.get_pos(pos1, pos2))
+
+            # print(move.get_pos(pos1, pos2))
 
             # print(
             #     move.get_pos(
             #         pos1 - self.homing_position[0], pos2 - self.homing_position[1]
             #     )
             # )
-            print(pos1 - self.homing_position[0], pos2 - self.homing_position[1])
+            # print(pos1, pos2)
+            # print(self.homing_position[0] - pos1, self.homing_position[1] - pos2)
 
     def homing_sequence(self):
         homing_voltage = 1.5
@@ -223,6 +239,7 @@ class App(tkinter.Tk):
         sleep(1)
         move.neg_Y(0.6)
 
+        # Check Y axis
         while not home:
             limit_vals = self.limit_sensors.read_switches()
             self.update_GUI()
@@ -239,6 +256,7 @@ class App(tkinter.Tk):
         sleep(1)
         move.pos_X(0.6)
 
+        # Check X axis
         while not home:
             limit_vals = self.limit_sensors.read_switches()
             self.update_GUI()
@@ -251,6 +269,7 @@ class App(tkinter.Tk):
 
         move.stop_motors()
 
+        # Store encoder position at homing location
         self.homing_position = (e_1, e_2)
 
     def run(self):

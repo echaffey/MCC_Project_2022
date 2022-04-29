@@ -18,6 +18,8 @@ motor_2 = Settings.MOTOR_2_CHANNEL
 class Speed:
     speed_1 = 0.0
     speed_2 = 0.0
+    cur_pos_1 = None
+    cur_pos_2 = None
 
 
 """This file defines all of the movement functions for the system. 
@@ -42,6 +44,7 @@ def get_pos(encoder_val_1, encoder_val_2):
 
     revolutions_1 = encoder_val_1 / Settings.ENCODER_VALS_PER_REV
     revolutions_2 = encoder_val_2 / Settings.ENCODER_VALS_PER_REV
+
     phi_1 = revolutions_1 * 2 * np.pi
     phi_2 = revolutions_2 * 2 * np.pi
 
